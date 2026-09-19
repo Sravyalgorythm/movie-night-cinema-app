@@ -72,7 +72,7 @@ export const MOVIES: Movie[] = [
     streaming: ["Netflix"],
     familySafe: false,
     why: "Sharp, feel-good comedy with Ryan Gosling and Steve Carell at their most charismatic.",
-    poster: "https://image.tmdb.org/t/p/w500/1b58C4o9p5B73yV5e4ZsmJdKk5p.jpg",
+    poster: "https://image.tmdb.org/t/p/original/p4RafgAPk558muOjnBMHhMArjS2.jpg",
     trailerId: "8iCWtxJmvnk",
   },
   {
@@ -177,7 +177,7 @@ export const MOVIES: Movie[] = [
     streaming: ["Netflix", "Prime Video"],
     familySafe: false,
     why: "The defining 2000s high-school satire packed with iconic burn-book quotes and sharp wit.",
-    poster: "https://image.tmdb.org/t/p/w500/fXm3YKXeE12IsOkviWj9WN21GQv.jpg",
+    poster: "https://m.media-amazon.com/images/M/MV5BMjE1MDQ4MjI1OV5BMl5BanBnXkFtZTcwNzcwODAzMw@@._V1_FMjpg_UX1000_.jpg",
     trailerId: "oDU84nmSDZY",
   },
   {
@@ -192,7 +192,7 @@ export const MOVIES: Movie[] = [
     streaming: ["Netflix", "Prime Video"],
     familySafe: false,
     why: "Emma Stone shines in this witty, charming high-school spin on The Scarlet Letter.",
-    poster: "https://image.tmdb.org/t/p/w500/1XddB1c1BspY9441wOaU2e7D3H4.jpg",
+    poster: "https://image.tmdb.org/t/p/original/spOqvK66GBWF3rPBXhUogyCIWHQ.jpg",
     trailerId: "KNbHYcvVlog",
   },
   {
