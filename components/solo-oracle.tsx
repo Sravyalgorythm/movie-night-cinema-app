@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react"
 import { Search, Sparkles } from "lucide-react"
-import { MOVIES, MOOD_CHIPS, byId, type Movie } from "@/lib/movies"
+import { MOVIES, MOOD_CHIPS, RATING_FILTERS, byId, searchMovies, type Movie } from "@/lib/movies"
 import { MovieCard } from "@/components/movie-card"
 
 function pickFrom(ids: string[], exclude?: string): Movie {
@@ -10,17 +10,6 @@ function pickFrom(ids: string[], exclude?: string): Movie {
   const source = pool.length ? pool : ids
   const id = source[Math.floor(Math.random() * source.length)]
   return byId(id)
-}
-
-function searchMovies(query: string): string[] {
-  const q = query.trim().toLowerCase()
-  if (!q) return []
-  const terms = q.split(/\s+/)
-  const matches = MOVIES.filter((m) => {
-    const haystack = [m.title, ...m.genres, ...m.tags].join(" ").toLowerCase()
-    return terms.some((t) => haystack.includes(t))
-  })
-  return matches.map((m) => m.id)
 }
 
 export function SoloOracle({
@@ -31,32 +20,81 @@ export function SoloOracle({
   const [query, setQuery] = useState("")
   const [activeChip, setActiveChip] = useState<string | null>(null)
   const [pickPool, setPickPool] = useState<string[] | null>(null)
+  const [ratingFilter, setRatingFilter] = useState<string>("All Ratings")
   const [result, setResult] = useState<Movie | null>(null)
+  const [noMatch, setNoMatch] = useState(false)
 
+  // Movies allowed by the active age-rating pill.
+  const ratedMovies = useMemo(() => {
+    const filter = RATING_FILTERS.find((f) => f.label === ratingFilter)
+    if (!filter || !filter.ratings) return MOVIES
+    return MOVIES.filter((m) => filter.ratings!.includes(m.rating))
+  }, [ratingFilter])
+
+  // The pool "Find My Movie" draws from, after rating filter + chip/search.
   const currentPool = useMemo(() => {
-    if (pickPool) return pickPool
-    const searched = searchMovies(query)
-    return searched.length ? searched : MOVIES.map((m) => m.id)
-  }, [pickPool, query])
+    const ratedIds = ratedMovies.map((m) => m.id)
+    if (pickPool) return pickPool.filter((id) => ratedIds.includes(id))
+    const searched = searchMovies(query, ratedMovies)
+    return searched.length ? searched : ratedIds
+  }, [pickPool, query, ratedMovies])
 
   function handleFind() {
-    setResult(pickFrom(currentPool))
+    const searched = query.trim() && !pickPool ? searchMovies(query, ratedMovies) : null
+    if (searched && searched.length === 0) {
+      setNoMatch(true)
+      setResult(null)
+      return
+    }
+    setNoMatch(false)
+    if (currentPool.length === 0) {
+      setResult(null)
+      return
+    }
+    // Search results are sorted best-first; lead with the top match.
+    setResult(searched && searched.length ? byId(searched[0]) : pickFrom(currentPool))
   }
 
   function handleChip(chip: (typeof MOOD_CHIPS)[number]) {
     setActiveChip(chip.label)
     setQuery("")
+    setNoMatch(false)
     setPickPool(chip.ids)
-    setResult(pickFrom(chip.ids))
+    const ratedIds = ratedMovies.map((m) => m.id)
+    const scoped = chip.ids.filter((id) => ratedIds.includes(id))
+    setResult(scoped.length ? pickFrom(scoped) : null)
   }
 
   function handleReroll() {
+    if (currentPool.length === 0) return
     setResult(pickFrom(currentPool, result?.id))
   }
 
   return (
     <div className="space-y-6">
       <div className="rounded-2xl border border-slate-700 bg-slate-800/60 p-5 sm:p-6">
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          <span className="mr-1 text-sm font-medium text-slate-400">Age rating:</span>
+          {RATING_FILTERS.map((f) => (
+            <button
+              key={f.label}
+              type="button"
+              onClick={() => {
+                setRatingFilter(f.label)
+                setNoMatch(false)
+              }}
+              aria-pressed={ratingFilter === f.label}
+              className={`rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${
+                ratingFilter === f.label
+                  ? "border-amber-500 bg-amber-500/15 text-amber-300"
+                  : "border-slate-600 bg-slate-900/60 text-slate-300 hover:border-slate-500 hover:text-white"
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+
         <label htmlFor="vibe-search" className="sr-only">
           What vibe are you craving tonight?
         </label>
@@ -70,6 +108,7 @@ export function SoloOracle({
               setQuery(e.target.value)
               setPickPool(null)
               setActiveChip(null)
+              setNoMatch(false)
             }}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.nativeEvent.isComposing && e.keyCode !== 229) handleFind()
@@ -108,6 +147,17 @@ export function SoloOracle({
 
       {result ? (
         <MovieCard movie={result} onWatchTrailer={() => onWatchTrailer(result)} onReroll={handleReroll} />
+      ) : noMatch ? (
+        <div className="rounded-2xl border border-dashed border-slate-700 bg-slate-800/30 p-12 text-center">
+          <Search className="mx-auto mb-3 h-8 w-8 text-slate-600" />
+          <p className="text-slate-300">
+            No match for <span className="font-semibold text-amber-400">&ldquo;{query}&rdquo;</span>
+            {ratingFilter !== "All Ratings" && <span> in {ratingFilter}</span>}.
+          </p>
+          <p className="mt-1 text-sm text-slate-500">
+            Try a mood (funny, scary, gritty, school, love) or loosen the age rating.
+          </p>
+        </div>
       ) : (
         <div className="rounded-2xl border border-dashed border-slate-700 bg-slate-800/30 p-12 text-center">
           <Sparkles className="mx-auto mb-3 h-8 w-8 text-slate-600" />

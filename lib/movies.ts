@@ -165,6 +165,51 @@ export const MOVIES: Movie[] = [
     poster: "https://image.tmdb.org/t/p/w500/eHuGQ10FUzK1mdOY69wF5pGgEf5.jpg",
     trailerId: "ZS_8btMjx2U",
   },
+  {
+    id: "mean-girls",
+    title: "Mean Girls",
+    year: 2004,
+    rating: "PG-13",
+    runtime: 97,
+    rt: 84,
+    genres: ["Comedy"],
+    tags: ["school", "high school", "teen", "funny", "campus", "comfort"],
+    streaming: ["Netflix", "Prime Video"],
+    familySafe: false,
+    why: "The defining 2000s high-school satire packed with iconic burn-book quotes and sharp wit.",
+    poster: "https://image.tmdb.org/t/p/w500/fXm3YKXeE12IsOkviWj9WN21GQv.jpg",
+    trailerId: "oDU84nmSDZY",
+  },
+  {
+    id: "easy-a",
+    title: "Easy A",
+    year: 2010,
+    rating: "PG-13",
+    runtime: 92,
+    rt: 85,
+    genres: ["Comedy", "Rom-Com"],
+    tags: ["school", "high school", "teen", "funny", "smart", "rumors"],
+    streaming: ["Netflix", "Prime Video"],
+    familySafe: false,
+    why: "Emma Stone shines in this witty, charming high-school spin on The Scarlet Letter.",
+    poster: "https://image.tmdb.org/t/p/w500/1XddB1c1BspY9441wOaU2e7D3H4.jpg",
+    trailerId: "KNbHYcvVlog",
+  },
+  {
+    id: "clueless",
+    title: "Clueless",
+    year: 1995,
+    rating: "PG-13",
+    runtime: 97,
+    rt: 81,
+    genres: ["Comedy", "Rom-Com"],
+    tags: ["school", "high school", "teen", "fashion", "90s", "nostalgia"],
+    streaming: ["Prime Video"],
+    familySafe: false,
+    why: "A razor-sharp high-school comedy wrapped in legendary 90s fashion and wit.",
+    poster: "https://image.tmdb.org/t/p/w500/8AwVTcgpTnmeOs4TdTWqcFDXEsA.jpg",
+    trailerId: "KeGqX4GVBZE",
+  },
 ]
 
 export const byId = (id: string) => MOVIES.find((m) => m.id === id)!
@@ -180,4 +225,90 @@ export function formatRuntime(minutes: number) {
   const h = Math.floor(minutes / 60)
   const m = minutes % 60
   return `${h}h ${m}m`
+}
+
+// Maps user search intent to the movie tags/genres it should hit.
+const SYNONYMS: { triggers: string[]; targets: string[] }[] = [
+  {
+    triggers: ["school", "high school", "highschool", "teen", "teens", "teenager", "college", "campus", "student", "students", "class", "classroom"],
+    targets: ["teen", "school", "high school", "campus"],
+  },
+  {
+    triggers: ["funny", "laugh", "laughs", "hilarious", "humor", "humour", "comedy", "lighthearted"],
+    targets: ["comedy", "funny"],
+  },
+  {
+    triggers: ["scary", "spooky", "creepy", "horror", "frightening", "terrifying"],
+    targets: ["thriller", "horror", "dark"],
+  },
+  {
+    triggers: ["grit", "gritty", "dark", "crime", "criminal", "noir"],
+    targets: ["neo-noir", "crime", "dark", "thriller"],
+  },
+  {
+    triggers: ["love", "date", "romance", "romantic", "relationship", "couple"],
+    targets: ["rom-com", "romance"],
+  },
+]
+
+export const RATING_FILTERS: { label: string; ratings: string[] | null }[] = [
+  { label: "All Ratings", ratings: null },
+  { label: "Family (G/PG)", ratings: ["G", "PG"] },
+  { label: "Teens (PG-13)", ratings: ["PG-13"] },
+  { label: "Mature (R)", ratings: ["R"] },
+]
+
+function scoreMovie(movie: Movie, terms: string[], synonymTargets: string[]): number {
+  const title = movie.title.toLowerCase()
+  const genres = movie.genres.map((g) => g.toLowerCase())
+  const tags = movie.tags.map((t) => t.toLowerCase())
+  const why = movie.why.toLowerCase()
+  let score = 0
+
+  for (const term of terms) {
+    if (!term) continue
+    if (title.includes(term)) score += 5
+    if (genres.some((g) => g === term)) score += 4
+    if (genres.some((g) => g.includes(term))) score += 2
+    if (tags.some((t) => t === term)) score += 4
+    if (tags.some((t) => t.includes(term))) score += 2
+    if (why.includes(term)) score += 1
+  }
+
+  for (const target of synonymTargets) {
+    if (genres.some((g) => g.includes(target))) score += 4
+    if (tags.some((t) => t.includes(target))) score += 4
+    if (title.includes(target)) score += 3
+    if (why.includes(target)) score += 1
+  }
+
+  return score
+}
+
+/**
+ * Scores a candidate pool against the query using direct term matching plus a
+ * synonym dictionary. Returns ids sorted best-first, only including movies with
+ * a score greater than 0 — no random animated fallback.
+ */
+export function searchMovies(query: string, pool: Movie[] = MOVIES): string[] {
+  const q = query.trim().toLowerCase()
+  if (!q) return []
+
+  const terms = q.split(/\s+/).filter(Boolean)
+
+  const synonymTargets = new Set<string>()
+  for (const entry of SYNONYMS) {
+    const hit = entry.triggers.some((trigger) =>
+      trigger.includes(" ") ? q.includes(trigger) : terms.includes(trigger),
+    )
+    if (hit) entry.targets.forEach((t) => synonymTargets.add(t))
+  }
+  const targets = [...synonymTargets]
+
+  const scored = pool
+    .map((m) => ({ id: m.id, score: scoreMovie(m, terms, targets) }))
+    .filter((s) => s.score > 0)
+    .sort((a, b) => b.score - a.score)
+
+  return scored.map((s) => s.id)
 }
