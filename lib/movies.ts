@@ -132,7 +132,7 @@ export const MOVIES: Movie[] = [
     streaming: ["Disney+"],
     familySafe: true,
     why: "A poignant opening leads into an imaginative balloon-powered wilderness adventure.",
-    poster: "https://image.tmdb.org/t/p/w500/vpbaStTMt8qqgE2DaAYTMKbAcYc.jpg",
+    poster: "https://image.tmdb.org/t/p/w500/vpbaStTMt8qqXaEgnOR2EE4DNJk.jpg",
     trailerId: "Ajcdb4FAL7A",
   },
   {
@@ -251,11 +251,12 @@ const SYNONYMS: { triggers: string[]; targets: string[] }[] = [
   },
 ]
 
+// Cumulative: each tier allows everything up to and including its maturity.
 export const RATING_FILTERS: { label: string; ratings: string[] | null }[] = [
   { label: "All Ratings", ratings: null },
   { label: "Family (G/PG)", ratings: ["G", "PG"] },
-  { label: "Teens (PG-13)", ratings: ["PG-13"] },
-  { label: "Mature (R)", ratings: ["R"] },
+  { label: "Teens (PG-13)", ratings: ["G", "PG", "PG-13"] },
+  { label: "Mature (R)", ratings: ["G", "PG", "PG-13", "R"] },
 ]
 
 function scoreMovie(movie: Movie, terms: string[], synonymTargets: string[]): number {
