@@ -1,6 +1,7 @@
 # 🎬 Movie Night: Skip the Scrolling
 >*We'll scroll. You watch*
-> Stop debating what to watch. Pick one movie and start your night.
+
+Stop debating what to watch. Pick one movie and start your night.
 
 Most streaming services are built to keep you browsing their catalog. **Movie Night** does the opposite: it cuts through the debate, handles household disagreement, and serves up **exactly one movie** to watch.
 
