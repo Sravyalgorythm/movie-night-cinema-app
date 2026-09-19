@@ -1,33 +1,63 @@
-# movie-night-cinema-app
+# 🎬 Movie Night: Skip the Scrolling
+> *"We'll scroll. You watch."*
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [v0](https://v0.app).
+Stop debating what to watch. **Movie Night** cures decision fatigue by delivering algorithmic clarity: **exactly ONE tailored movie pick** per session, eliminating endless scrolling across fragmented streaming libraries.
 
-## Built with v0
+---
 
-This repository is linked to a [v0](https://v0.app) project. You can continue developing by visiting the link below -- start new chats to make changes, and v0 will push commits directly to this repo. Every merge to `main` will automatically deploy.
+## 🚀 Live Demo & Submission Links
+- **Live Deployment:** [movie-night-skip-the-scrolling.vercel.app](https://movie-night-skip-the-scrolling.vercel.app)
+- **Source Code Repository:** [github.com/Sravyalgorythm/movie-night-cinema-app](https://github.com/Sravyalgorythm/movie-night-cinema-app)
+- **Built for:** Hack Devengers 2.0
 
-[Continue working on v0 →](https://v0.app/chat/projects/prj_QAfil7HVNSDb08xAaEGRutdfEcZZ)
+---
 
-## Getting Started
+## ⚡ Key Features
 
-First, run the development server:
+### 1. 🔮 Solo Oracle ("One & Done")
+- **Weighted Synset Intent Matching:** Freeform search input powered by keyword expansion (e.g., searching *"school"* maps intelligently to high-school classics rather than falling back to default lists).
+- **Maturity Filter Controls:** Dedicated age-rating toggle (*All*, *Family G/PG*, *Teens PG-13*, *Mature R*) ensuring demographic-safe matches.
+- **Instant Mood Chips:** 1-click curated mood profiles (*🌧️ Late Night Neo-Noir*, *🛋️ Zero-Brain Comfort*, *🍿 Popcorn Action*, *✨ 90s Nostalgia*).
+- **Comprehensive Metadata & Preview:** Renders verified studio posters, RT scores, runtime, streaming availability (Netflix, Prime Video, Disney+), match rationale, and embedded modal trailers.
+
+### 2. ⚔️ Couples Showdown
+- **Compromise Engine:** Evaluates divergent tastes from both partners and computes a percentage-weighted crossover pick bridging both genres.
+- **Sudden Death Wheel:** Interactive HTML5 Canvas physics wheel for deadlocked debates with realistic deceleration, tick feedback, and celebratory confetti.
+
+### 3. 👨‍👩‍👧‍👦 Family Night
+- **Veto Roulette (Democracy Mode):** Displays a curated four-title pool of family-safe titles where members cast vetoes until exactly one unanimous survivor remains.
+
+---
+
+## 🛠️ Architecture & Tech Stack
+
+| Layer | Technology | Description |
+| :--- | :--- | :--- |
+| **Framework** | **Next.js 15 (App Router) & React 19** | Server-driven routing with reactive client state |
+| **Language** | **TypeScript** | Strict type definitions across movie schemas and scoring engines |
+| **Styling** | **Tailwind CSS** | Custom A24/Apple TV-inspired dark cinema design system |
+| **Icons** | **Lucide React** | Lightweight SVG iconography |
+| **Graphics & FX** | **HTML5 Canvas & Canvas-Confetti** | 60 FPS wheel rotation physics and particle celebrations |
+| **Audio Engine** | **Web Audio API** | Procedurally synthesized oscillators (zero external MP3 assets) |
+| **Media Pipeline** | **TMDB CDN & YouTube Embed API** | High-definition studio key art and privacy-enhanced video playback |
+
+---
+
+## 💻 Local Development Setup
+
+Clone and launch locally in under 2 minutes:
 
 ```bash
+# 1. Clone the repository
+git clone [https://github.com/Sravyalgorythm/movie-night-cinema-app.git](https://github.com/Sravyalgorythm/movie-night-cinema-app.git)
+
+# 2. Enter project folder
+cd movie-night-cinema-app
+
+# 3. Install dependencies
+npm install
+# or
+pnpm install
+
+# 4. Start local development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-## Learn More
-
-To learn more, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [v0 Documentation](https://v0.app/docs) - learn about v0 and how to use it.
