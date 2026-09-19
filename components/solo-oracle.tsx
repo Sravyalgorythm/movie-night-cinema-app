@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { Search, Sparkles } from "lucide-react"
+import { Search, Sparkles, RotateCcw } from "lucide-react"
 import { MOVIES, MOOD_CHIPS, RATING_FILTERS, byId, searchMovies, type Movie } from "@/lib/movies"
 import { MovieCard } from "@/components/movie-card"
 
@@ -41,16 +41,12 @@ export function SoloOracle({
 
   function handleFind() {
     const searched = query.trim() && !pickPool ? searchMovies(query, ratedMovies) : null
-    if (searched && searched.length === 0) {
+    if ((searched && searched.length === 0) || currentPool.length === 0) {
       setNoMatch(true)
       setResult(null)
       return
     }
     setNoMatch(false)
-    if (currentPool.length === 0) {
-      setResult(null)
-      return
-    }
     // Search results are sorted best-first; lead with the top match.
     setResult(searched && searched.length ? byId(searched[0]) : pickFrom(currentPool))
   }
@@ -58,11 +54,20 @@ export function SoloOracle({
   function handleChip(chip: (typeof MOOD_CHIPS)[number]) {
     setActiveChip(chip.label)
     setQuery("")
-    setNoMatch(false)
     setPickPool(chip.ids)
     const ratedIds = ratedMovies.map((m) => m.id)
     const scoped = chip.ids.filter((id) => ratedIds.includes(id))
+    setNoMatch(scoped.length === 0)
     setResult(scoped.length ? pickFrom(scoped) : null)
+  }
+
+  function handleResetFilters() {
+    setQuery("")
+    setActiveChip(null)
+    setPickPool(null)
+    setRatingFilter("All Ratings")
+    setNoMatch(false)
+    setResult(null)
   }
 
   function handleReroll() {
@@ -150,13 +155,18 @@ export function SoloOracle({
       ) : noMatch ? (
         <div className="rounded-2xl border border-dashed border-slate-700 bg-slate-800/30 p-12 text-center">
           <Search className="mx-auto mb-3 h-8 w-8 text-slate-600" />
-          <p className="text-slate-300">
-            No match for <span className="font-semibold text-amber-400">&ldquo;{query}&rdquo;</span>
-            {ratingFilter !== "All Ratings" && <span> in {ratingFilter}</span>}.
-          </p>
+          <p className="text-lg font-semibold text-slate-200">Sorry, no matches found.</p>
           <p className="mt-1 text-sm text-slate-500">
-            Try a mood (funny, scary, gritty, school, love) or loosen the age rating.
+            Try tweaking your vibe or switching to a broader age rating.
           </p>
+          <button
+            type="button"
+            onClick={handleResetFilters}
+            className="mt-5 inline-flex items-center justify-center gap-2 rounded-xl border border-slate-600 bg-slate-900/60 px-5 py-2.5 text-sm font-semibold text-slate-200 transition-colors hover:border-amber-500 hover:text-amber-300"
+          >
+            <RotateCcw className="h-4 w-4" />
+            Reset Filters
+          </button>
         </div>
       ) : (
         <div className="rounded-2xl border border-dashed border-slate-700 bg-slate-800/30 p-12 text-center">
